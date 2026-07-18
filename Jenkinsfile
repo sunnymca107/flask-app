@@ -12,7 +12,7 @@ pipeline{
         {
             steps{
                 sh '''
-                echo "sunnymca107" | docker login -u sunnymca107 --password-sunny@123
+                docker login -u sunnymca107 --password-sunny@123
                 '''
             }
         }
