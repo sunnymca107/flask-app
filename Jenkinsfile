@@ -1,39 +1,29 @@
-pipeline {
-    agent any
-    environment {
-        IMAGE="sunnymca107/flask-app:${BUILD_NUMBER}"
-    }
-    stages {
-        stage('Clone') {
-            steps {
-                git 'https://github.com/sunnymca107/flask-app.git'
+pipeline{
+    agent any 
+    stages{
+        stage('Build docker image')
+        {
+            steps{
+                sh 'docker build -t sunnymca107/flask-app:v1 .'
+                
             }
         }
-        stage('Install Dependencies') {
-            steps {
-                sh 'pip3 install -r requirements.txt'
-            }
-        }
-        stage('Docker Build') {
-            steps {
-                sh 'docker build -t $IMAGE .'
-            }
-        }
-        stage('Docker Push') {
-            steps {
-                sh 'docker push $IMAGE'
-            }
-        }
-        stage('Deploy Docker Swarm') {
-            steps {
+        stage('dockerhub login')
+        {
+            steps{
                 sh '''
-                docker service rm flask-app || true
-                docker service create \
-                --name flask-app \
-                -p 5000:5000 \
-                $IMAGE
+                echo "sunnymca107" | docker login -u sunnymca107 --password-stdin
                 '''
             }
         }
+
+        stage('pushing image to dockerhub')
+        {
+            steps{
+                sh 'docker push sunnymca107/flask-app:v1'
+            }
+            
+        }
+
     }
 }
